@@ -20,3 +20,9 @@ Due to the previous project stuff I kept in the switches also reset the LED colo
 
 
 The displaying of the bitmap on the OLED has some tomfoolery involved with it. This comes as a result of the OLED graphics data addressing. 
+
+If you want to compile / use this code you'll need to add a couple CMSIS libraries from Keil.
+  - Device startup
+  - CMSIS core.
+
+You can do this at the beginning of project creation or by clicking the manage runtime environment and adding them at any point post project creation.
