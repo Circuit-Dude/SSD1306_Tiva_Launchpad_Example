@@ -8,7 +8,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "TM4C123.h"
-
+#include "alphabet_mem_binary.h"
 
 
 #define RED 0x02;
@@ -104,6 +104,8 @@ void LCD_cursor(void);
 // Function declarations
  void flexthebison(uint8_t x);
  uint8_t getpixel(uint8_t x, uint8_t y);
+ uint8_t getlettercol(uint8_t letter, uint8_t column);
+ void write_letter(uint8_t letter);
  void OLED_Clear(void);
  
 // Function prototypes initialize, tranmit and read functions 
@@ -178,26 +180,29 @@ int main()
 	//==========================
 	// CLEAR OLED
 	//==========================
-	for (j=0; j<4; j++){
 		I2C0->MDR = 0x00;
 		while((I2C0->MCS)&0x01);
 		I2C0->MCS =0x03;
 		while((I2C0->MCS)&0x01);
-		I2C0->MDR = 0xb0|j;  //page select
+		I2C0->MDR = 0xb0;  //page select
 		I2C0->MCS =0x05;
 		while((I2C0->MCS)&0x01);
 		
-		for(i=0; i<128; i++){
-		I2C0->MDR = 0x00000040;
+		for(i=0; i<16; i++){
+			write_letter(i);
+		}	
+
+		I2C0->MDR = 0x00;
 		while((I2C0->MCS)&0x01);
 		I2C0->MCS =0x03;
 		while((I2C0->MCS)&0x01);
-		pixel = getpixel(i,j);
-		I2C0->MDR = pixel;
+		I2C0->MDR = 0xb0|2;  //page select
 		I2C0->MCS =0x05;
 		while((I2C0->MCS)&0x01);
-		}
-	}
+		
+		for(i=0; i<16; i++){
+			write_letter(i+16);
+		}	
 
 	GPIOF->DATA = 0x00;
 	
@@ -469,33 +474,33 @@ Delay(200);
 //		while((I2C0->MCS)&0x01); 
 
 //col address lower nibble
-//	i2c->MSA |= (0x3c<<1);			//Set up slave address (see datasheet)
-//	i2c->MDR = 0x00000000;
-//	while((i2c->MCS)&0x01);
-//	i2c->MCS =0x03;
-//	while((i2c->MCS)&0x01);
-//	i2c->MDR = 0x00000021;
-//	i2c->MCS =0x01;
-//	while((i2c->MCS)&0x01);
-//	i2c->MDR = 0x00000000;
-//	i2c->MCS =0x01;
-//	while((i2c->MCS)&0x01);
-//	i2c->MDR = 0x0000007f;
-//	i2c->MCS =0x05;
-//	while((i2c->MCS)&0x01);
-//	
-//	//addressing mode
-//	i2c->MSA |= (0x3c<<1);			//Set up slave address (see datasheet)
-//	i2c->MDR = 0x00000000;
-//	while((i2c->MCS)&0x01);
-//	i2c->MCS =0x03;
-//	while((i2c->MCS)&0x01);
-//	i2c->MDR = 0x00000020;
-//	i2c->MCS =0x01;
-//	while((i2c->MCS)&0x01);
-//	i2c->MDR = 0x00000000;
-//	i2c->MCS =0x05;
-//	while((i2c->MCS)&0x01);
+	i2c->MSA |= (0x3c<<1);			//Set up slave address (see datasheet)
+	i2c->MDR = 0x00000000;
+	while((i2c->MCS)&0x01);
+	i2c->MCS =0x03;
+	while((i2c->MCS)&0x01);
+	i2c->MDR = 0x00000021;
+	i2c->MCS =0x01;
+	while((i2c->MCS)&0x01);
+	i2c->MDR = 0x00000000;
+	i2c->MCS =0x01;
+	while((i2c->MCS)&0x01);
+	i2c->MDR = 0x0000007f;
+	i2c->MCS =0x05;
+	while((i2c->MCS)&0x01);
+	
+	//addressing mode
+	i2c->MSA |= (0x3c<<1);			//Set up slave address (see datasheet)
+	i2c->MDR = 0x00000000;
+	while((i2c->MCS)&0x01);
+	i2c->MCS =0x03;
+	while((i2c->MCS)&0x01);
+	i2c->MDR = 0x00000020;
+	i2c->MCS =0x01;
+	while((i2c->MCS)&0x01);
+	i2c->MDR = 0x00000000;
+	i2c->MCS =0x05;
+	while((i2c->MCS)&0x01);
 		
 		Delay(200);
 }
@@ -526,6 +531,35 @@ void OLED_Clear(void)
     //==========================
 	// CLEAR OLED
 	//==========================
+	//col address lower nibble
+		I2C0->MSA |= (0x3c<<1);			//Set up slave address (see datasheet)
+		I2C0->MDR = 0x00000000;
+		while((I2C0->MCS)&0x01);
+		I2C0->MCS =0x03;
+		while((I2C0->MCS)&0x01);
+		I2C0->MDR = 0x00000021;
+		I2C0->MCS =0x01;
+		while((I2C0->MCS)&0x01);
+		I2C0->MDR = 0x00000000;
+		I2C0->MCS =0x01;
+		while((I2C0->MCS)&0x01);
+		I2C0->MDR = 0x0000007f;
+		I2C0->MCS =0x05;
+		while((I2C0->MCS)&0x01);
+		
+		//addressing mode
+		I2C0->MSA |= (0x3c<<1);			//Set up slave address (see datasheet)
+		I2C0->MDR = 0x00000000;
+		while((I2C0->MCS)&0x01);
+		I2C0->MCS =0x03;
+		while((I2C0->MCS)&0x01);
+		I2C0->MDR = 0x00000020;
+		I2C0->MCS =0x01;
+		while((I2C0->MCS)&0x01);
+		I2C0->MDR = 0x00000000;
+		I2C0->MCS =0x05;
+		while((I2C0->MCS)&0x01);
+	
 	for (uint8_t j=0; j<4; j++){
 		I2C0->MDR = 0x00;
 		while((I2C0->MCS)&0x01);
@@ -603,3 +637,51 @@ uint8_t getpixel(uint8_t x, uint8_t y){
 	
 	return result;
 }
+
+uint8_t getlettercol(uint8_t letter, uint8_t column){
+	uint8_t  result; //, test, row, col, shift; //,bit;
+	bool bit;
+//	row = y*8;
+//	col = x/8;
+	
+	result =0;
+	
+	for (uint8_t i=0; i<8; i++){
+//		row = (y*8) +i;  	//debug
+//		col = x/8;   			//debug
+//		shift = x%8;			//debug
+//		test = flexbison[(y*8) + i][x/8];		//debug
+		bit = ( alphabet[letter][i]&0x01 << (7-(column%8))) ;
+		result |= bit<<(i);
+	}	
+	
+	return result;
+}
+
+
+void write_letter(uint8_t letter){
+	//==========================
+	// write flex bison
+	//==========================
+	uint8_t bit;
+//	uint32_t time, save;
+//	int blah, f;
+	//OLED_Clear();
+//	SysTick->VAL = 0x00;  //clear for timing
+//	blah = Systick;
+//	save = SysTick->VAL;
+	
+		
+		for(uint8_t i=0; i<8; i++){
+		I2C0->MDR = 0x00000040;
+		while((I2C0->MCS)&0x01);
+		I2C0->MCS =0x03;
+		while((I2C0->MCS)&0x01);
+		//bit = x ? ~oledram[j][i]:oledram[j][i];
+		bit = getlettercol(letter,i);
+		I2C0->MDR = bit;
+		I2C0->MCS =0x05;
+		while((I2C0->MCS)&0x01);
+		}
+	}
+
